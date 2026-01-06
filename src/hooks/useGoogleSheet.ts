@@ -92,7 +92,7 @@ export const useGoogleSheet = (): UseGoogleSheetReturn => {
 
       // EXACT match for your Google Form question
       const nameColumnIndex = headers.findIndex(
-        h => h === "What is your name?"
+        h => h === "ENTER NAME"
       );
 
       if (nameColumnIndex === -1) {
