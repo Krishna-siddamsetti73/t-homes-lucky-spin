@@ -96,7 +96,7 @@ export const WinnerPopup = ({ winner, isOpen, onClose }: WinnerPopupProps) => {
             </h2>
 
             <p className="text-muted-foreground mb-8">
-              You are the lucky winner!
+              Please come on to the stage !
             </p>
 
             {/* Next spin button */}

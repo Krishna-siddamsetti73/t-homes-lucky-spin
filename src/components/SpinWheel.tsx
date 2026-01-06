@@ -18,7 +18,7 @@ const WHEEL_COLORS = [
   "hsl(220, 60%, 40%)",
 ];
 
-const CANVAS_SIZE = 500;
+const CANVAS_SIZE = 580;
 const CENTER_RADIUS = 55;
 const INNER_TEXT_RADIUS = 130; // 👈 FIXED text start distance
 
@@ -66,7 +66,7 @@ export const SpinWheel = ({
       ctx.fill();
 
       ctx.fillStyle = "#fff";
-      ctx.font = "bold 18px Inter";
+      ctx.font = "bold 10px Inter";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText("No participants", cx, cy);

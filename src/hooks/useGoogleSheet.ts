@@ -94,7 +94,7 @@ export const useGoogleSheet = (): UseGoogleSheetReturn => {
       const nameColumnIndex = headers.findIndex(
         h => h === "ENTER NAME"
       );
-
+      
       if (nameColumnIndex === -1) {
         throw new Error('Column "What is your name?" not found.');
       }
