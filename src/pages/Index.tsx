@@ -5,14 +5,16 @@ import { WinnerPopup } from "@/components/WinnerPopup";
 import { ParticipantCounter } from "@/components/ParticipantCounter";
 import { GoogleSheetConfig } from "@/components/GoogleSheetConfig";
 import { Footer } from "@/components/Footer";
-import { useGoogleSheet } from "@/hooks/useGoogleSheet";
+import { useGoogleSheet, Participant } from "@/hooks/useGoogleSheet";
 import { toast } from "sonner";
 import { RotateCcw } from "lucide-react";
 
 const Index = () => {
   const [sheetUrl, setSheetUrl] = useState("");
   const [isSpinning, setIsSpinning] = useState(false);
-  const [winner, setWinner] = useState<string | null>(null);
+
+  // ✅ winner is now an OBJECT, not string
+  const [winner, setWinner] = useState<Participant | null>(null);
   const [showWinnerPopup, setShowWinnerPopup] = useState(false);
 
   const {
@@ -24,10 +26,16 @@ const Index = () => {
     resetParticipants,
   } = useGoogleSheet();
 
-  const handleSpinComplete = (name: string, index: number) => {
-    setWinner(name);
+  const handleSpinComplete = (_winnerName: string, index: number) => {
+    const selectedWinner = participants[index];
+
+    setWinner({
+      name: selectedWinner.name,
+      phone: selectedWinner.phone,
+    });
+
+    toast.success(`🎉 ${selectedWinner.name} is the winner!`);
     setShowWinnerPopup(true);
-    toast.success(`🎉 ${name} is the winner!`);
     removeParticipant(index);
   };
 
@@ -39,6 +47,7 @@ const Index = () => {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-6 mb-12">
             <ParticipantCounter count={participants.length} />
+
             <GoogleSheetConfig
               sheetUrl={sheetUrl}
               onSheetUrlChange={setSheetUrl}
@@ -55,8 +64,9 @@ const Index = () => {
           )}
 
           <section className="flex flex-col items-center">
+            {/* ✅ Pass ONLY names to SpinWheel */}
             <SpinWheel
-              participants={participants}
+              participants={participants.map(p => p.name)}
               onSpinComplete={handleSpinComplete}
               isSpinning={isSpinning}
               setIsSpinning={setIsSpinning}
@@ -84,10 +94,14 @@ const Index = () => {
 
       <Footer />
 
+      {/* ✅ Winner popup gets OBJECT */}
       <WinnerPopup
-        winner={winner || ""}
+        winner={winner}
         isOpen={showWinnerPopup}
-        onClose={() => setShowWinnerPopup(false)}
+        onClose={() => {
+          setShowWinnerPopup(false);
+          setWinner(null);
+        }}
       />
     </div>
   );

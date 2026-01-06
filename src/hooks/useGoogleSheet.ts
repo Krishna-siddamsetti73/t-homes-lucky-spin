@@ -1,7 +1,12 @@
 import { useState, useCallback } from "react";
 
+export interface Participant {
+  name: string;
+  phone: string;
+}
+
 interface UseGoogleSheetReturn {
-  participants: string[];
+  participants: Participant[];
   isLoading: boolean;
   error: string | null;
   fetchParticipants: (url: string) => Promise<void>;
@@ -9,39 +14,27 @@ interface UseGoogleSheetReturn {
   resetParticipants: () => void;
 }
 
-// Demo participants for testing
-const DEMO_PARTICIPANTS = [
-  "Rajesh Kumar",
-  "Priya Sharma",
-  "Amit Patel",
-  "Sneha Gupta",
-  "Vikram Singh",
-  "Anjali Verma",
-  "Rohit Agarwal",
-  "Kavita Reddy",
-  "Suresh Nair",
-  "Meera Joshi",
-  "Arjun Mehta",
-  "Pooja Chauhan",
-  "Deepak Yadav",
-  "Swati Mishra",
-  "Rahul Saxena",
+// Demo participants
+const DEMO_PARTICIPANTS: Participant[] = [
+  { name: "Rajesh Kumar", phone: "9000000001" },
+  { name: "Priya Sharma", phone: "9000000002" },
+  { name: "Amit Patel", phone: "9000000003" },
 ];
 
-// Converts /edit or /view Google Sheet URL → CSV URL
+// Convert Google Sheet link → CSV link
 const toCsvUrl = (url: string, sheetName = "Form_Responses") => {
   const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
   if (!match) return null;
 
   const sheetId = match[1];
-
   return `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(
     sheetName
   )}`;
 };
 
 export const useGoogleSheet = (): UseGoogleSheetReturn => {
-  const [participants, setParticipants] = useState<string[]>(DEMO_PARTICIPANTS);
+  const [participants, setParticipants] =
+    useState<Participant[]>(DEMO_PARTICIPANTS);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -62,18 +55,13 @@ export const useGoogleSheet = (): UseGoogleSheetReturn => {
 
     try {
       const response = await fetch(csvUrl);
-
       if (!response.ok) {
-        throw new Error("Failed to fetch data. Make sure the sheet is published.");
+        throw new Error("Failed to fetch sheet. Make sure it is published.");
       }
 
       const csvText = await response.text();
-
-      // Guard: user pasted non-CSV or unpublished sheet
-      if (csvText.startsWith("<!DOCTYPE html") || csvText.includes("<html")) {
-        throw new Error(
-          "Sheet is not published. Please publish it to the web as CSV."
-        );
+      if (csvText.includes("<html")) {
+        throw new Error("Sheet is not published as CSV.");
       }
 
       const rows = csvText
@@ -82,44 +70,44 @@ export const useGoogleSheet = (): UseGoogleSheetReturn => {
         .filter(Boolean);
 
       if (rows.length < 2) {
-        throw new Error("Sheet has no response data.");
+        throw new Error("Sheet has no data.");
       }
 
-      // Parse header row
       const headers = rows[0]
         .split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
         .map(h => h.replace(/"/g, "").trim());
 
-      // EXACT match for your Google Form question
-      const nameColumnIndex = headers.findIndex(
-        h => h === "ENTER NAME"
-      );
-      
-      if (nameColumnIndex === -1) {
-        throw new Error('Column "What is your name?" not found.');
+      const nameCol = headers.findIndex(h => h === "ENTER NAME");
+      const phoneCol = headers.findIndex(h => h === "ENTER PHONE NUMBER");
+
+      if (nameCol === -1 || phoneCol === -1) {
+        throw new Error("Name or Phone Number column not found.");
       }
 
-      const names: string[] = [];
+      const parsed: Participant[] = [];
 
       for (let i = 1; i < rows.length; i++) {
-        const columns = rows[i]
+        const cols = rows[i]
           .split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
           .map(c => c.replace(/"/g, "").trim());
 
-        const name = columns[nameColumnIndex];
-        if (name) names.push(name);
+        const name = cols[nameCol];
+        const phone = cols[phoneCol];
+
+        if (name && phone) {
+          parsed.push({ name, phone });
+        }
       }
 
-      if (names.length === 0) {
-        throw new Error("No participant names found.");
+      if (!parsed.length) {
+        throw new Error("No participants found.");
       }
 
-      setParticipants(names);
+      setParticipants(parsed);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to fetch participants";
-      setError(message);
-      console.error("Google Sheet error:", err);
+      const msg = err instanceof Error ? err.message : "Failed to load sheet";
+      setError(msg);
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
