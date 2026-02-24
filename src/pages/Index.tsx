@@ -85,7 +85,7 @@ const Index = () => {
             />
 
             <GoogleSheetConfig
-              title="Second Sheet (Primary Winners)"
+              title="sheet confirmation link"
               sheetUrl={sheetUrl2}
               onSheetUrlChange={setSheetUrl2}
               onRefresh={() => fetchParticipants(sheetUrl2, "sheet2")}
