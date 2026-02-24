@@ -1,6 +1,8 @@
+"use client";
+
 import { useEffect } from "react";
 import confetti from "canvas-confetti";
-import { Trophy, PartyPopper, Sparkles, Phone } from "lucide-react";
+import { Trophy, Phone } from "lucide-react";
 
 interface WinnerPopupProps {
   winner: {
@@ -26,11 +28,13 @@ export const WinnerPopup = ({ winner, isOpen, onClose }: WinnerPopupProps) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Overlay */}
       <div
         className="absolute inset-0 bg-foreground/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
+      {/* Popup */}
       <div className="relative z-10 bg-card rounded-3xl p-10 max-w-lg mx-4 text-center">
         <div className="mb-6 flex justify-center">
           <div className="w-24 h-24 rounded-full success-gradient flex items-center justify-center">
@@ -56,6 +60,7 @@ export const WinnerPopup = ({ winner, isOpen, onClose }: WinnerPopupProps) => {
         </p>
 
         <button
+          type="button"
           onClick={onClose}
           className="px-8 py-4 rounded-xl font-semibold text-lg hero-gradient text-primary-foreground"
         >

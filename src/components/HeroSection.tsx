@@ -1,4 +1,4 @@
-import { Building2 } from "lucide-react";
+"use client";
 
 export const HeroSection = () => {
   return (
@@ -6,14 +6,21 @@ export const HeroSection = () => {
       {/* Animated background shapes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-success/5 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
+        <div
+          className="absolute -bottom-40 -left-40 w-96 h-96 bg-success/5 rounded-full blur-3xl animate-float"
+          style={{ animationDelay: "2s" }}
+        />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/3 rounded-full blur-3xl" />
       </div>
 
       <div className="relative max-w-4xl mx-auto text-center">
-        {/* Brand logo/icon */}
-        <div className="inline-flex items-center gap-3 mb-6">
-          <img src="/thomeslogo-removebg-preview.png" className=" flex items-center justify-center"  style={{height:180}}></img>
+        {/* Brand logo */}
+        <div className="mb-6 flex justify-center">
+          <img
+            src="/thomeslogo-removebg-preview.png"
+            alt="Thomes Infra Logo"
+            className="h-[180px] w-auto object-contain"
+          />
         </div>
 
         {/* Main title */}

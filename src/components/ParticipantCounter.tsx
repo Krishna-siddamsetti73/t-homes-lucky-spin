@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
 
@@ -23,12 +25,13 @@ export const ParticipantCounter = ({ count }: ParticipantCounterProps) => {
     const timer = setInterval(() => {
       currentStep++;
       const progress = currentStep / steps;
-      // Easing function for smooth animation
+
+      // Ease-out animation
       const easeOut = 1 - Math.pow(1 - progress, 3);
       const newCount = Math.round(easeOut * count);
-      
+
       setDisplayCount(newCount);
-      
+
       if (currentStep >= steps) {
         setDisplayCount(count);
         clearInterval(timer);
@@ -48,7 +51,7 @@ export const ParticipantCounter = ({ count }: ParticipantCounterProps) => {
           <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
             Total Participants
           </p>
-          <p className="text-4xl font-display font-bold text-gradient-primary animate-count-up">
+          <p className="text-4xl font-display font-bold text-gradient-primary">
             {displayCount}
           </p>
         </div>
