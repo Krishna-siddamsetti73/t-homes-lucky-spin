@@ -8,7 +8,7 @@ export const Footer = () => {
         {/* Logo + Tagline */}
         <div className="flex items-center gap-3">
           <img
-            src="/thomeslogo-removebg-preview.png"
+            src="https://thomesinfra.com/wp-content/uploads/2026/02/cropped-T-Homes-Logo-1.png"
             alt="Thomes Infra Logo"
             className="w-10 h-10 object-contain"
           />
