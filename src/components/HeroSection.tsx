@@ -17,7 +17,7 @@ export const HeroSection = () => {
         {/* Brand logo */}
         <div className="mb-6 flex justify-center">
           <img
-            src="/thomeslogo-removebg-preview.png"
+            src="https://thomesinfra.com/wp-content/uploads/2026/02/cropped-T-Homes-Logo-1.png"
             alt="Thomes Infra Logo"
             className="h-[180px] w-auto object-contain"
           />

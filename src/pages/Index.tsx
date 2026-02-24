@@ -114,7 +114,7 @@ const Index = () => {
             {sheet2Participants.length === 0 &&
               sheet1Participants.length > 0 && (
                 <p className="text-sm text-green-600 mt-4">
-                  Second sheet completed 🎉 Now spinning from first sheet
+                  {/* Second sheet completed 🎉 Now spinning from first sheet */}
                 </p>
               )}
 
