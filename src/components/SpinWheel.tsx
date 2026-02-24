@@ -1,7 +1,11 @@
+"use client";
+
 import { useRef, useState, useEffect } from "react";
 
 interface SpinWheelProps {
   participants: string[];
+  /** list of indices within `participants` that are eligible to win; if absent all are eligible */
+  eligibleIndexes?: number[];
   onSpinComplete: (winner: string, index: number) => void;
   isSpinning: boolean;
   setIsSpinning: (spinning: boolean) => void;
@@ -20,10 +24,11 @@ const WHEEL_COLORS = [
 
 const CANVAS_SIZE = 580;
 const CENTER_RADIUS = 55;
-const INNER_TEXT_RADIUS = 130; // 👈 FIXED text start distance
+const INNER_TEXT_RADIUS = 130;
 
 export const SpinWheel = ({
   participants,
+  eligibleIndexes,
   onSpinComplete,
   isSpinning,
   setIsSpinning,
@@ -66,7 +71,7 @@ export const SpinWheel = ({
       ctx.fill();
 
       ctx.fillStyle = "#fff";
-      ctx.font = "bold 10px Inter";
+      ctx.font = "bold 12px Inter";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText("No participants", cx, cy);
@@ -105,9 +110,7 @@ export const SpinWheel = ({
       ctx.fillStyle = "#fff";
       ctx.font = "bold 14px Inter";
 
-      const label =
-        name.length > 14 ? name.slice(0, 12) + "…" : name;
-
+      const label = name.length > 14 ? name.slice(0, 12) + "…" : name;
       ctx.fillText(label, INNER_TEXT_RADIUS, 0);
       ctx.restore();
     });
@@ -148,12 +151,20 @@ export const SpinWheel = ({
   const spin = () => {
     if (isSpinning || !participants.length) return;
 
+    if (eligibleIndexes && eligibleIndexes.length === 0) return;
+
     setIsSpinning(true);
 
-    const index = Math.floor(Math.random() * participants.length);
+    const candidates =
+      eligibleIndexes && eligibleIndexes.length > 0
+        ? eligibleIndexes
+        : participants.map((_, i) => i);
+
+    const chosen =
+      candidates[Math.floor(Math.random() * candidates.length)];
+
     const slice = 360 / participants.length;
-    const target =
-      360 * 8 + (360 - index * slice - slice / 2);
+    const target = 360 * 8 + (360 - chosen * slice - slice / 2);
 
     const duration = 4000;
     let start: number | null = null;
@@ -169,17 +180,20 @@ export const SpinWheel = ({
         animationRef.current = requestAnimationFrame(animate);
       } else {
         setIsSpinning(false);
-        onSpinComplete(participants[index], index);
+        onSpinComplete(participants[chosen], chosen);
       }
     };
 
     animationRef.current = requestAnimationFrame(animate);
   };
 
-  useEffect(
-    () => () => animationRef.current && cancelAnimationFrame(animationRef.current),
-    []
-  );
+  useEffect(() => {
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="flex justify-center">
@@ -187,17 +201,24 @@ export const SpinWheel = ({
         className="relative"
         style={{ width: CANVAS_SIZE, height: CANVAS_SIZE }}
       >
-        <canvas
-          ref={canvasRef}
-          width={CANVAS_SIZE}
-          height={CANVAS_SIZE}
-        />
+        <canvas ref={canvasRef} width={CANVAS_SIZE} height={CANVAS_SIZE} />
 
-        {/* PERFECTLY CENTERED BUTTON */}
+        {eligibleIndexes && eligibleIndexes.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="text-red-500 font-semibold">
+           
+            </span>
+          </div>
+        )}
+
         <button
+          type="button"
           onClick={spin}
-          disabled={isSpinning}
-          className="absolute inset-0 m-auto w-24 h-24 rounded-full 
+          disabled={
+            isSpinning ||
+            (eligibleIndexes !== undefined && eligibleIndexes.length === 0)
+          }
+          className="absolute inset-0 m-auto w-24 h-24 rounded-full
                      font-bold text-lg text-white z-10
                      transition-transform duration-300
                      hover:scale-105 active:scale-95"
